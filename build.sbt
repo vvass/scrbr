@@ -25,6 +25,8 @@ libraryDependencies ++= Seq(
 
 )
 
+
+
 assemblyJarName in assembly := "something.jar"
 
 packageOptions in assembly ~= { pos =>
