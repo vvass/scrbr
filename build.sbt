@@ -12,16 +12,17 @@ lazy val root = (project in file(".")).
   )
 
 libraryDependencies ++= Seq(
-  "io.spray".%%("spray-can")                                      % "1.3.3",
-  "io.spray".%%("spray-routing")                                  % "1.3.3",
-  "io.spray".%%("spray-json")                                     % "1.3.2",
-  "io.spray".%%("spray-testkit")                                  % "1.3.3"   % "test",
-  "com.typesafe.akka".%%("akka-actor")                            % "2.3.9",
-  "com.typesafe.akka".%%("akka-testkit")                          % "2.3.9"   % "test",
-  "com.typesafe.scala-logging".%("scala-logging_2.11")            % "3.1.0",
-  "org.specs2".%%("specs2-core")                                  % "2.3.11"  % "test",
-  "com.twitter".%("util-core_2.10")                               % "6.33.0",
-  "com.typesafe.akka".%("akka-slf4j_2.11")                        % "2.4.2"
+  "io.spray"                      .%%("spray-can")                % "1.3.3",
+  "io.spray"                      .%%("spray-routing")            % "1.3.3",
+  "io.spray"                      .%%("spray-json")               % "1.3.2",
+  "io.spray"                      .%%("spray-client")             % "1.3.3",
+  "io.spray"                      .%%("spray-testkit")            % "1.3.3"   % "test",
+  "com.typesafe.akka"             .%%("akka-actor")               % "2.3.9",
+  "com.typesafe.akka"             .%%("akka-testkit")             % "2.3.9"   % "test",
+  "com.typesafe.scala-logging"    .%("scala-logging_2.11")        % "3.1.0",
+  "org.specs2"                    .%%("specs2-core")              % "2.3.11"  % "test",
+  "com.twitter"                   .%("util-core_2.10")            % "6.33.0",
+  "com.typesafe.akka"             .%("akka-slf4j_2.11")           % "2.4.2"
 
 )
 

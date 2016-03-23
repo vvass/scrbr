@@ -1,3 +1,4 @@
+import core.AuthCoreObject.{oAuthAuthorizer,Token, Consumer}
 import spray.http.HttpRequest
 
 import scala.io.Source

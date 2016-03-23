@@ -1,7 +1,6 @@
 import akka.actor.{Actor, ActorRef}
 import akka.io.IO
 import core.TweetMarshaller
-import org.TwitterAuthorization
 import spray.can.Http
 import spray.http._
 
@@ -15,9 +14,10 @@ class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with Tweet
 
   def receive: Receive = {
     case query: String =>
+      //Todo might need to expand body in order to get more results back
       val body = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), s"track=$query")
-      val rq = HttpRequest(HttpMethods.POST, uri = uri, entity = body) ~> authorize
-      sendTo(io).withResponsesReceivedBy(self)(rq)
+      val request = HttpRequest(HttpMethods.POST, uri = uri, entity = body) ~> authorize
+      sendTo(io).withResponsesReceivedBy(self)(request)
     case ChunkedResponseStart(_) =>
     case MessageChunk(entity, _) => TweetUnmarshaller(entity).fold(_ => (), processor !)
     case _ =>
