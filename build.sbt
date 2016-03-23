@@ -8,7 +8,10 @@ lazy val commonSettings = Seq(
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
   settings(
-    name := "scrbr"
+    name := "scrbr",
+    // Cached resolution feature is akin to incremental compilation,
+    // which only recompiles the sources that have been changed since the last compile.
+    updateOptions := updateOptions.value.withCachedResolution(true)
   )
 
 libraryDependencies ++= Seq(
@@ -25,8 +28,6 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"             .%("akka-slf4j_2.11")           % "2.4.2"
 
 )
-
-
 
 assemblyJarName in assembly := "something.jar"
 
