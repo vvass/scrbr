@@ -3,6 +3,8 @@ import akka.io.IO
 import core.TweetMarshaller
 import spray.can.Http
 import spray.http._
+import spray.client.pipelining._
+
 
 object TweetStreamerActor {
   val twitterUri = Uri("https://stream.twitter.com/1.1/statuses/filter.json")
