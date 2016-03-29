@@ -1,4 +1,4 @@
-package tweet
+package org.44lab5.scrbr.models.tweet
 
 /**
   * Created by vvass on 3/23/16.
