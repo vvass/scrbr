@@ -1,12 +1,12 @@
 package core
 
+import models.{Tweet, User, Place}
 import spray.httpx.unmarshalling.{MalformedContent, Unmarshaller, Deserialized}
 import spray.http._
 import spray.json._
-import tweet.{Tweet,User,Place}
 import scala.util.Try
 
-trait TweetMarshaller {
+trait TweetMarshallerTrait {
 
   implicit object TweetUnmarshaller extends Unmarshaller[Tweet] {
 

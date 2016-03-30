@@ -1,6 +1,6 @@
 import akka.actor.{Actor, ActorRef}
 import akka.io.IO
-import core.TweetMarshaller
+import core.{TweetMarshallerTrait, TweetMarshaller}
 import spray.can.Http
 import spray.http._
 import spray.client.pipelining._
@@ -10,7 +10,7 @@ object TweetStreamerActor {
   val twitterUri = Uri("https://stream.twitter.com/1.1/statuses/filter.json")
 }
 
-class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with TweetMarshaller {
+class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with TweetMarshallerTrait {
   this: TwitterAuthorization =>
   val io = IO(Http)(context.system)
 
