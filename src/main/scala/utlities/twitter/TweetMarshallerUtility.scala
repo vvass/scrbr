@@ -1,8 +1,8 @@
-package utlities
+package utlities.twitter
 
-import models.tweet.{Tweet,Place,User}
+import models.tweet.{Place, Tweet, User}
 import spray.http.HttpEntity
-import spray.httpx.unmarshalling.{MalformedContent, Unmarshaller, Deserialized}
+import spray.httpx.unmarshalling.{Deserialized, MalformedContent, Unmarshaller}
 import spray.json._
 
 import scala.util.Try
