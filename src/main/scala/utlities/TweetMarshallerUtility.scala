@@ -1,7 +1,11 @@
 package utlities
 
+import models.tweet.{Tweet,Place,User}
+import spray.http.HttpEntity
 import spray.httpx.unmarshalling.{MalformedContent, Unmarshaller, Deserialized}
 import spray.json._
+
+import scala.util.Try
 
 /**
   * Created by vvass on 3/29/16.
