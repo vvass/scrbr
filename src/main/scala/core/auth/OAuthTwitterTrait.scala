@@ -1,7 +1,8 @@
-package core
+package core.auth
+
+import spray.http.HttpRequest
 
 import scala.io.Source
-import spray.http.HttpRequest
 
 /**
   * Created by vvass on 3/29/16.

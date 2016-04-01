@@ -1,12 +1,11 @@
-package actors.tweet
+package actors
 
-import core.TwitterAuthorizationTrait
-import spray.http._
-import spray.client.pipelining._
-import akka.actor.{ActorRef, Actor}
-import spray.http.HttpRequest
-import spray.can.Http
+import akka.actor.{Actor, ActorRef}
 import akka.io.IO
+import core.auth.TwitterAuthorizationTrait
+import spray.can.Http
+import spray.client.pipelining._
+import spray.http.{HttpRequest, _}
 import utlities.twitter.TweetMarshallerUtility
 
 /**

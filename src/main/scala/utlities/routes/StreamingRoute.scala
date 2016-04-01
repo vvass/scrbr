@@ -21,5 +21,5 @@ trait StreamingRoute extends HttpService {
 }
 
 abstract class MainStreamingRoute extends StreamingRoute {
-  
+
 }

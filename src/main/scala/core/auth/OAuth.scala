@@ -1,15 +1,17 @@
-package core
+package core.auth
 
 /**
   * Created by vvass on 3/29/16.
   */
-import javax.crypto
-import java.nio.charset.Charset
-import spray.http.{HttpEntity, MediaTypes, ContentType, HttpRequest}
-import spray.http.HttpHeaders.RawHeader
-import org.parboiled.common.Base64
-import scala.collection.immutable.TreeMap
 import java.net.URLEncoder
+import java.nio.charset.Charset
+import javax.crypto
+
+import org.parboiled.common.Base64
+import spray.http.HttpHeaders.RawHeader
+import spray.http.{ContentType, HttpEntity, HttpRequest, MediaTypes}
+
+import scala.collection.immutable.TreeMap
 
 object OAuth {
   case class Consumer(key: String, secret: String)

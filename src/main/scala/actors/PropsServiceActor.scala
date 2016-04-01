@@ -1,8 +1,7 @@
-package actors.props
+package actors
 
 import akka.actor.Actor
-import akka.actor.Actor.Receive
-import spray.http.{Timedout, HttpRequest, HttpResponse, StatusCodes}
+import spray.http.{HttpRequest, HttpResponse, StatusCodes, Timedout}
 import utlities.twitter.routes.StreamingRoute
 
 /**
