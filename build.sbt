@@ -24,7 +24,7 @@ libraryDependencies ++= Seq(
 
 )
 
-assemblyJarName in assembly := "something.jar"
+assemblyJarName in assembly := "scrbrdev.jar"
 
 packageOptions in assembly ~= { pos =>
   pos.filterNot { po =>
