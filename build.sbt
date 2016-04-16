@@ -11,7 +11,7 @@ lazy val commonSettings = Seq(
 
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
-//  enablePlugins(TomcatPlugin).
+  enablePlugins(TomcatPlugin).
   settings(
     name := "scrbr",
     logLevel := Level.Debug
@@ -38,6 +38,7 @@ libraryDependencies ++= {
     "io.spray".%%("spray-http")                                     % iospray,
     "io.spray".%%("spray-util")                                     % iospray,
     "io.spray".%%("spray-routing")                                  % iospray,
+    "io.spray".%%("spray-servlet")                                  % iospray,
     "io.spray".%%("spray-testkit")                                  % iospray       % "test",
     "io.spray".%%("spray-json")                                     % "1.3.2",
     // -- akka --
@@ -46,7 +47,7 @@ libraryDependencies ++= {
     "com.typesafe.akka".%%("akka-testkit")                          % akkaVersion     % "test",
     // -- twitter --
     "com.twitter".%("util-core_2.10")                               % "6.33.0",
-//    "javax.servlet".%("javax.servlet-api")                          % "3.0.1"       % "provided",
+    "javax.servlet".%("javax.servlet-api")                          % "3.0.1"       % "provided",
     // -- testing --
     "org.specs2".%%("specs2-core")                                  % akkaVersion   % "test",
     "org.scalatest" %%("scalatest")                                 % "2.2.6"       % "test"

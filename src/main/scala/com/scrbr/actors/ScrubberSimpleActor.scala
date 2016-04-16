@@ -1,25 +1,15 @@
 package com.scrbr.actors
 
-import akka.actor.Actor
-import spray.routing.{Route, HttpService}
+import akka.actor.{ActorLogging, Actor}
+import com.scrbr.utilities.routes.MainServiceRoute
 
 /**
   * Created by vvass on 4/15/16.
   */
-class ScrubberSimpleActor extends Actor with MainRoute {
+class ScrubberSimpleActor extends Actor with MainServiceRoute with ActorLogging {
 
-
-
-
-  def actorRefFactory = context
-  def receive = runRoute(route)
-}
-
-trait MainRoute extends HttpService {
-  val route = {
-    get {
-      complete("I exist!")
-    }
-  }
+  override def actorRefFactory = context
+  override def receive = runRoute(route)
 
 }
+
