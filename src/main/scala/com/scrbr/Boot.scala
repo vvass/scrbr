@@ -3,7 +3,7 @@ package com.scrbr
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.io.IO
 import com.scrbr.actors.ScrubberSimpleActor
-import com.scrbr.config.Configuration
+import com.scrbr.config.HostConfiguration
 import spray.can.Http
 import spray.servlet.WebBoot
 
@@ -11,7 +11,7 @@ import spray.servlet.WebBoot
 /**
   * Created by vvass on 4/15/16.
   */
-class Boot extends WebBoot with Configuration {
+class Boot extends WebBoot with HostConfiguration {
 
   // create an actor system for application
   implicit val system = ActorSystem("simple-service")

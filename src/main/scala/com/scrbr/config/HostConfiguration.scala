@@ -7,7 +7,7 @@ import scala.util.Try
 /**
   * Created by vvass on 4/15/16.
   */
-trait Configuration {
+trait HostConfiguration {
 
   /**
     * Application config object.

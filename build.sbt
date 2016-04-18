@@ -38,6 +38,7 @@ libraryDependencies ++= {
     "io.spray".%%("spray-http")                                     % iospray,
     "io.spray".%%("spray-util")                                     % iospray,
     "io.spray".%%("spray-routing")                                  % iospray,
+    "io.spray".%%("spray-client")                                   % iospray,
     "io.spray".%%("spray-servlet")                                  % iospray,
     "io.spray".%%("spray-testkit")                                  % iospray       % "test",
     "io.spray".%%("spray-json")                                     % "1.3.2",
