@@ -32,7 +32,8 @@ libraryDependencies ++= {
 
   Seq(
     // -- logging --
-    "com.typesafe.scala-logging".%("scala-logging_2.11")            % "3.1.0",
+//    "com.typesafe.scala-logging".%("scala-logging_2.11")            % "3.1.0",
+    "ch.qos.logback".%("logback-classic")                           % "1.1.7",
     // -- spray --
     "io.spray".%%("spray-can")                                      % iospray,
     "io.spray".%%("spray-http")                                     % iospray,
@@ -69,4 +70,22 @@ packageOptions in assembly ~= { pos =>
 assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false, includeDependency = false)
 
 
+//Adds tomcat container and remote debugging
+def debugTomcat = Command.command("debugTomcat") { state =>
+  import com.earldouglas.xwp.ContainerPlugin.start
+  val javaOpts =
+    Seq(
+      "-Xdebug",
+      "-Xrunjdwp:server=y,transport=dt_socket,address=8080,suspend=n"
+    )
+  val state2 =
+    Project.extract(state).append(
+      Seq(javaOptions in Tomcat ++= javaOpts),
+      state
+    )
+  Project.extract(state2).runTask(start in Tomcat, state2)
+  state2
+}
+
+commands += debugTomcat
 

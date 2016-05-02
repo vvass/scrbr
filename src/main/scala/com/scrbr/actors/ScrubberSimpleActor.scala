@@ -9,7 +9,7 @@ import com.scrbr.utilities.routes.MainServiceRoute
 class ScrubberSimpleActor extends Actor with MainServiceRoute with ActorLogging {
 
   override def actorRefFactory = context
-  override def receive = runRoute(route)
+  def receive = runRoute(route)
 
 }
 

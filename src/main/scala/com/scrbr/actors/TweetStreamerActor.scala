@@ -1,5 +1,6 @@
 package com.scrbr.actors
 
+import com.scrbr.core.OAuth
 import com.scrbr.core.domain.{Place, Tweet, User}
 import spray.httpx.unmarshalling.{MalformedContent, Deserialized, Unmarshaller}
 import spray.http._
@@ -7,6 +8,7 @@ import spray.json._
 import spray.client.pipelining._
 import akka.actor.{ActorRef, Actor}
 import spray.http.HttpRequest
+import scala.io.Source
 import scala.util.Try
 import spray.can.Http
 import akka.io.IO
@@ -36,6 +38,10 @@ class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with Tweet
 
 trait TwitterAuthorization {
   def authorize: HttpRequest => HttpRequest
+}
+
+object TweetStreamerActor {
+  val twitterUri = Uri("https://stream.twitter.com/1.1/statuses/filter.json")
 }
 
 trait TweetMarshaller {
@@ -76,4 +82,16 @@ trait TweetMarshaller {
       }
     }.getOrElse(Left(MalformedContent("bad json")))
   }
+}
+
+
+trait OAuthTwitterAuthorization extends TwitterAuthorization {
+  import OAuth._
+  val home = System.getProperty("user.home")
+  val lines = Source.fromFile(s"$home/.twitter/activator").getLines().toList
+
+  val consumer = Consumer(lines(0), lines(1))
+  val token = Token(lines(2), lines(3))
+
+  val authorize: (HttpRequest) => HttpRequest = oAuthAuthorizer(consumer, token)
 }

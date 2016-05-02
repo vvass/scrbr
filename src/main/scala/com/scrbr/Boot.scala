@@ -1,10 +1,8 @@
 package com.scrbr
 
-import akka.actor.{ActorRef, ActorSystem, Props}
-import akka.io.IO
-import com.scrbr.actors.ScrubberSimpleActor
+import akka.actor.{ActorSystem, Props}
+import com.scrbr.actors.{OAuthTwitterAuthorization, TweetContentActor, TweetStreamerActor, ScrubberSimpleActor}
 import com.scrbr.config.HostConfiguration
-import spray.can.Http
 import spray.servlet.WebBoot
 
 
@@ -18,13 +16,15 @@ class Boot extends WebBoot with HostConfiguration {
 
   // create and start rest service actor
   override val serviceActor = system.actorOf(Props[ScrubberSimpleActor])
+//  val contentActor = system.actorOf(Props(new TweetContentActor))
+//  val serviceActor = system.actorOf(Props(new TweetStreamerActor(TweetStreamerActor.twitterUri, contentActor) with OAuthTwitterAuthorization ))
 
   // start HTTP server with rest service actor as a handler
 //  IO(Http) ! Http.Bind(service, serviceHost, servicePort)
 
-  system.registerOnTermination {
-    // put additional cleanup code here
-    system.log.info("Application shut down")
-  }
+    system.registerOnTermination {
+      // put additional cleanup code here
+      system.log.info("Application shut down")
+    }
 
 }

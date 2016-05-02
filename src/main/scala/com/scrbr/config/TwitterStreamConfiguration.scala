@@ -5,5 +5,5 @@ package com.scrbr.config
   */
 
 trait TwitterStreamConfiguration {
-
+  //TODO need something here
 }
