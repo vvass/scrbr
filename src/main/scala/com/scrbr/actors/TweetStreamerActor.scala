@@ -1,5 +1,6 @@
 package com.scrbr.actors
 
+import org.slf4j.LoggerFactory
 import com.scrbr.core.OAuth
 import com.scrbr.core.domain.{Place, Tweet, User}
 import spray.httpx.unmarshalling.{MalformedContent, Deserialized, Unmarshaller}
@@ -25,13 +26,31 @@ class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with Tweet
   this: TwitterAuthorization =>
   val io = IO(Http)(context.system)
 
-  def receive: Receive = {
+  val logger = LoggerFactory.getLogger(classOf[TweetStreamerActor])
+
+  //Initial state of the Actor
+  def receive = ready
+
+  def ready: Receive = {
+    case _ =>
+      logger.debug("I got a message")
+      val body = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), s"track=hillary")
+      val request = HttpRequest(HttpMethods.POST, uri = uri, entity = body) ~> authorize
+      sendTo(io).withResponsesReceivedBy(self)(request)
+      //As soon as you get the data you should change state to "connected" by using a "become"
+      context become connected
+  }
+
+  def connected: Receive = {
     case query: String =>
       val body = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), s"track=$query")
-      val rq = HttpRequest(HttpMethods.POST, uri = uri, entity = body) ~> authorize
-      sendTo(io).withResponsesReceivedBy(self)(rq)
-    case ChunkedResponseStart(_) =>
+      val request = HttpRequest(HttpMethods.POST, uri = uri, entity = body) ~> authorize
+      sendTo(io).withResponsesReceivedBy(self)(request)
+    case ChunkedResponseStart(_) => logger.info("Chunked Response started.")
     case MessageChunk(entity, _) => TweetUnmarshaller(entity).fold(_ => (), processor !)
+    case ChunkedMessageEnd(_, _) => logger.info("Chunked Message Ended")
+    case Http.Closed => logger.info("HTTP closed")
+    case Timedout(request: HttpRequest) => sender ! HttpResponse(200, "You have started the scrubber service! Congrats!")
     case _ =>
   }
 }

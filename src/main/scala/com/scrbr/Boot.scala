@@ -15,9 +15,9 @@ class Boot extends WebBoot with HostConfiguration {
   implicit val system = ActorSystem("simple-service")
 
   // create and start rest service actor
-  override val serviceActor = system.actorOf(Props[ScrubberSimpleActor])
-//  val contentActor = system.actorOf(Props(new TweetContentActor))
-//  val serviceActor = system.actorOf(Props(new TweetStreamerActor(TweetStreamerActor.twitterUri, contentActor) with OAuthTwitterAuthorization ))
+//  override val serviceActor = system.actorOf(Props[ScrubberSimpleActor])
+  val contentActor = system.actorOf(Props(new TweetContentActor))
+  val serviceActor = system.actorOf(Props(new TweetStreamerActor(TweetStreamerActor.twitterUri, contentActor) with OAuthTwitterAuthorization ))
 
   // start HTTP server with rest service actor as a handler
 //  IO(Http) ! Http.Bind(service, serviceHost, servicePort)

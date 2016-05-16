@@ -11,4 +11,8 @@ case class Place(country: String, name: String) {
   override lazy val toString = s"$name, $country"
 }
 
-case class Tweet(id: String, user: User, text: String, place: Option[Place])
+case class Tweet(
+  id: String,
+  user: User,
+  text: String,
+  place: Option[Place])
