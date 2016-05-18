@@ -31,6 +31,8 @@ libraryDependencies ++= {
   val iospray = "1.3.3"
 
   Seq(
+    // -- metrics and health checks --
+    "io.dropwizard.metrics".%("metrics-core")                       % "3.1.2",
     // -- logging --
 //    "com.typesafe.scala-logging".%("scala-logging_2.11")            % "3.1.0",
     "ch.qos.logback".%("logback-classic")                           % "1.1.7",

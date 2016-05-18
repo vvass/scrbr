@@ -34,7 +34,7 @@ class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with Tweet
   def ready: Receive = {
     case _ =>
       logger.debug("I got a message")
-      val body = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), s"track=hillary")
+      val body = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), s"stall_warnings=true")
       val request = HttpRequest(HttpMethods.POST, uri = uri, entity = body) ~> authorize
       sendTo(io).withResponsesReceivedBy(self)(request)
       //As soon as you get the data you should change state to "connected" by using a "become"
@@ -42,10 +42,6 @@ class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with Tweet
   }
 
   def connected: Receive = {
-    case query: String =>
-      val body = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), s"track=$query")
-      val request = HttpRequest(HttpMethods.POST, uri = uri, entity = body) ~> authorize
-      sendTo(io).withResponsesReceivedBy(self)(request)
     case ChunkedResponseStart(_) => logger.info("Chunked Response started.")
     case MessageChunk(entity, _) => TweetUnmarshaller(entity).fold(_ => (), processor !)
     case ChunkedMessageEnd(_, _) => logger.info("Chunked Message Ended")
@@ -61,6 +57,7 @@ trait TwitterAuthorization {
 
 object TweetStreamerActor {
   val twitterUri = Uri("https://stream.twitter.com/1.1/statuses/filter.json")
+  val twitterUri_v2 = Uri("https://stream.twitter.com/1.1/statuses/sample.json")
 }
 
 trait TweetMarshaller {
