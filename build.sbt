@@ -21,7 +21,8 @@ resolvers ++= Seq(
   "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
   "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
   "Spray Repository" at "http://repo.spray.io",
-  "Spray Nightlies" at "http://nightlies.spray.io/"
+  "Spray Nightlies" at "http://nightlies.spray.io/",
+  "ReactiveCouchbase repository" at "https://raw.github.com/ReactiveCouchbase/repository/master/snapshots"
 )
 
 
@@ -43,18 +44,23 @@ libraryDependencies ++= {
     "io.spray".%%("spray-routing")                                  % iospray,
     "io.spray".%%("spray-client")                                   % iospray,
     "io.spray".%%("spray-servlet")                                  % iospray,
-    "io.spray".%%("spray-testkit")                                  % iospray       % "test",
+    "io.spray".%%("spray-testkit")                                  % iospray         % "test",
     "io.spray".%%("spray-json")                                     % "1.3.2",
+    // -- couchbase --
+    "org.reactivecouchbase".%%("reactivecouchbase-core")            % "0.4-SNAPSHOT",
+    // -- CoreNLP --
+    "org.clulab".%%("processors")                                   % "5.8.3",
+    "org.clulab".%%("processors")                                   % "5.8.3" classifier "models",
     // -- akka --
     "com.typesafe.akka".%%("akka-actor")                            % akkaVersion,
     "com.typesafe.akka".%%("akka-slf4j")                            % akkaVersion,
     "com.typesafe.akka".%%("akka-testkit")                          % akkaVersion     % "test",
     // -- twitter --
     "com.twitter".%("util-core_2.10")                               % "6.33.0",
-    "javax.servlet".%("javax.servlet-api")                          % "3.0.1"       % "provided",
+    "javax.servlet".%("javax.servlet-api")                          % "3.0.1"         % "provided",
     // -- testing --
-    "org.specs2".%%("specs2-core")                                  % akkaVersion   % "test",
-    "org.scalatest" %%("scalatest")                                 % "2.2.6"       % "test"
+    "org.specs2".%%("specs2-core")                                  % akkaVersion     % "test",
+    "org.scalatest" %%("scalatest")                                 % "2.2.6"         % "test"
 
   )
 }

@@ -8,21 +8,16 @@ import spray.http._
 import spray.json._
 import spray.client.pipelining._
 import akka.actor.{ActorRef, Actor}
-import spray.http.HttpRequest
 import scala.io.Source
 import scala.util.Try
 import spray.can.Http
 import akka.io.IO
 
-
-
 /**
   * Created by vvass on 4/16/16.
   */
 
-
-
-class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with TweetMarshaller {
+class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with TweetMarshaller{
   this: TwitterAuthorization =>
   val io = IO(Http)(context.system)
 
@@ -44,7 +39,12 @@ class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with Tweet
   def connected: Receive = {
     case ChunkedResponseStart(_) => logger.info("Chunked Response started.")
     case MessageChunk(entity, _) => TweetUnmarshaller(entity).fold(_ => (), processor !)
-    case ChunkedMessageEnd(_, _) => logger.info("Chunked Message Ended")
+    case ChunkedMessageEnd(_, _) => {
+      logger.info("Chunked Message Ended")
+      // shutdown the driver
+      //      shutDownDriver
+
+    }
     case Http.Closed => logger.info("HTTP closed")
     case Timedout(request: HttpRequest) => sender ! HttpResponse(200, "You have started the scrubber service! Congrats!")
     case _ =>
@@ -85,6 +85,7 @@ trait TweetMarshaller {
     def apply(entity: HttpEntity): Deserialized[Tweet] = {
       Try {
         val json = JsonParser(entity.asString).asJsObject
+//        println(json.fields.get("place").toString)
         (json.fields.get("id_str"), json.fields.get("text"), json.fields.get("place"), json.fields.get("user")) match {
           case (Some(JsString(id)), Some(JsString(text)), Some(place), Some(user: JsObject)) =>
             val x = mkUser(user).fold(x => Left(x), { user =>
