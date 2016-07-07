@@ -1,6 +1,5 @@
 package com.scrbr.utilities.routes
 
-import akka.actor.ActorLogging
 import spray.routing.HttpService
 
 /**
