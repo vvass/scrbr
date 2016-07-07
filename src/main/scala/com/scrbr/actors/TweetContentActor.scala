@@ -42,14 +42,12 @@ class TweetContentActor extends Actor with TweetAnnotator {
 
   def receive: Receive = {
     case tweet: Tweet => {
-//      print(1+"-")
 
       val pipeline : HttpRequest => Future[HttpResponse] = (
-        addHeader("X-My-Special-Header", "fancy-value")
-//          ~> addCredentials(BasicHttpCredentials("bob", "secret"))
-//          ~> encode(Gzip)
+          encode(Gzip)
           ~> sendReceive
-//          ~> decode(Deflate)
+          ~> decode(Deflate)
+          ~> unmarshal[HttpResponse]
         )
 
       val responseFutures: Future[HttpResponse] = pipeline {
@@ -58,7 +56,7 @@ class TweetContentActor extends Actor with TweetAnnotator {
 
       responseFutures onComplete {
         case Success(response) =>
-          logger.info("it worked")
+          logger.info(response.entity.asString)
 
         case Failure(error) =>
           logger.info(s"You had a failure -- $error")
