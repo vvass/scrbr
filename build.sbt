@@ -35,8 +35,7 @@ libraryDependencies ++= {
     // -- metrics and health checks --
     "io.dropwizard.metrics".%("metrics-core")                       % "3.1.2",
     // -- logging --
-//    "com.typesafe.scala-logging".%("scala-logging_2.11")            % "3.1.0",
-    "ch.qos.logback".%("logback-classic")                           % "1.1.7",
+    "ch.qos.logback".%("logback-classic")                           % "1.1.7",                               % "3.5.4_a2.3",
     // -- spray --
     "io.spray".%%("spray-can")                                      % iospray,
     "io.spray".%%("spray-http")                                     % iospray,

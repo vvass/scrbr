@@ -1,7 +1,8 @@
 package com.scrbr
 
 import akka.actor.{ActorSystem, Props}
-import com.scrbr.actors.{OAuthTwitterAuthorization, TweetContentActor, TweetStreamerActor}
+import com.codahale.metrics.Counter
+import com.scrbr.actors.{TweetContentCouchbaseActor, OAuthTwitterAuthorization, TweetContentActor, TweetStreamerActor}
 import com.scrbr.config.HostConfiguration
 import spray.servlet.WebBoot
 
@@ -9,15 +10,27 @@ import spray.servlet.WebBoot
 /**
   * Created by vvass on 4/15/16.
   */
-class Boot extends WebBoot with HostConfiguration {
+
+
+trait Instrumented {
+  val metrics = BootLoader.metricRegistry
+}
+
+
+class Boot extends WebBoot with HostConfiguration with Instrumented{
+
+  val bootCounter: Counter = metrics.counter("Starting boot counter.")
+  bootCounter.inc() // Increments up
 
   // create an actor system for application
   implicit val system = ActorSystem("simple-service")
 
-  // create and start rest service actor
-  val contentActor = system.actorOf(Props(new TweetContentActor))
-  val serviceActor = system.actorOf(Props(new TweetStreamerActor(TweetStreamerActor.twitterUri_v2, contentActor) with OAuthTwitterAuthorization ))
+  // This actor works with couchbase in order to server up results
+//  lazy val contentActor = system.actorOf(Props(new TweetContentActor(system)))
+    lazy val contentActor = system.actorOf(Props(new TweetContentCouchbaseActor(system)))
 
+  // This actor works with Twitter in order to start a streaming catcher
+  lazy val serviceActor = system.actorOf(Props(new TweetStreamerActor(TweetStreamerActor.twitterUri_v2, contentActor) with OAuthTwitterAuthorization ))
 
   system.registerOnTermination {
     // put additional cleanup code here
@@ -25,3 +38,10 @@ class Boot extends WebBoot with HostConfiguration {
   }
 
 }
+
+object BootLoader {
+
+  // The application wide metrics registry.
+  val metricRegistry = new com.codahale.metrics.MetricRegistry()
+}
+
