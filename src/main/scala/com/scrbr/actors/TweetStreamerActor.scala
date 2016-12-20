@@ -17,7 +17,7 @@ import akka.io.IO
   * Created by vvass on 4/16/16.
   */
 
-class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with TweetMarshaller{
+class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with TweetMarshaller {
   this: TwitterAuthorization =>
   val io = IO(Http)(context.system)
 
@@ -37,16 +37,11 @@ class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with Tweet
   }
 
   def connected: Receive = {
-    case ChunkedResponseStart(_) => logger.info("Chunked Response started.")
+    case ChunkedResponseStart(_) => logger.info("Chunked Response started.") // TODO put this message in a config
     case MessageChunk(entity, _) => TweetUnmarshaller(entity).fold(_ => (), processor !)
-    case ChunkedMessageEnd(_, _) => {
-      logger.info("Chunked Message Ended")
-      // shutdown the driver
-      //      shutDownDriver
-
-    }
+    case ChunkedMessageEnd(_, _) => logger.info("Chunked Message Ended") // TODO put this message in a config
     case Http.Closed => logger.info("HTTP closed")
-    case Timedout(request: HttpRequest) => sender ! HttpResponse(200, "You have started the scrubber service! Congrats!")
+    case Timedout(request: HttpRequest) => sender ! HttpResponse(200, "You have started the scrubber service! Congrats!") // TODO put this message in a config
     case _ =>
   }
 }
@@ -55,7 +50,7 @@ trait TwitterAuthorization {
   def authorize: HttpRequest => HttpRequest
 }
 
-object TweetStreamerActor {
+object TweetStreamerActor { //TODO put this in configuration file
   val twitterUri = Uri("https://stream.twitter.com/1.1/statuses/filter.json")
   val twitterUri_v2 = Uri("https://stream.twitter.com/1.1/statuses/sample.json")
 }
@@ -65,7 +60,11 @@ trait TweetMarshaller {
   implicit object TweetUnmarshaller extends Unmarshaller[Tweet] {
 
     def mkUser(user: JsObject): Deserialized[User] = {
-      (user.fields("id_str"), user.fields("lang"), user.fields("followers_count")) match {
+      (
+        user.fields("id_str"),
+        user.fields("lang"),
+        user.fields("followers_count")
+      ) match {
         case (JsString(id), JsString(lang), JsNumber(followers)) => Right(User(id, lang, followers.toInt))
         case (JsString(id), _, _)                                => Right(User(id, "", 0))
         case _                                                   => Left(MalformedContent("bad user"))
@@ -74,38 +73,46 @@ trait TweetMarshaller {
 
     def mkPlace(place: JsValue): Deserialized[Option[Place]] = place match {
       case JsObject(fields) =>
-        (fields.get("country"), fields.get("name")) match {
+        (
+          fields.get("country"),
+          fields.get("name")
+        ) match {
           case (Some(JsString(country)), Some(JsString(name))) => Right(Some(Place(country, name)))
           case _                                               => Left(MalformedContent("bad place"))
         }
       case JsNull => Right(None)
-      case _ => Left(MalformedContent("bad tweet"))
+      case _      => Left(MalformedContent("bad tweet")) //TODO put this in configuration file
     }
 
     def apply(entity: HttpEntity): Deserialized[Tweet] = {
       Try {
         val json = JsonParser(entity.asString).asJsObject
-//        println(json.fields.get("place").toString)
-        (json.fields.get("id_str"), json.fields.get("text"), json.fields.get("place"), json.fields.get("user")) match {
-          case (Some(JsString(id)), Some(JsString(text)), Some(place), Some(user: JsObject)) =>
+        (
+          json.fields.get("id_str"),
+          json.fields.get("lang"),
+          json.fields.get("text"),
+          json.fields.get("place"),
+          json.fields.get("user")
+        ) match {
+          case (Some(JsString(id)), Some(JsString(lang)), Some(JsString(text)), Some(place), Some(user: JsObject)) =>
             val x = mkUser(user).fold(x => Left(x), { user =>
               mkPlace(place).fold(x => Left(x), { place =>
-                Right(Tweet(id, user, text, place))
+                Right(Tweet(id, user, text, lang, place))
               })
             })
             x
-          case _ => Left(MalformedContent("bad tweet"))
+          case _ => Left(MalformedContent("bad tweet")) //TODO put this in configuration file
         }
       }
-    }.getOrElse(Left(MalformedContent("bad json")))
+    }.getOrElse(Left(MalformedContent("bad json"))) //TODO put this in configuration file
   }
 }
 
 
 trait OAuthTwitterAuthorization extends TwitterAuthorization {
   import OAuth._
-  val home = System.getProperty("user.home")
-  val lines = Source.fromFile(s"$home/.twitter/activator").getLines().toList
+  val home = System.getProperty("user.home") //TODO put this in configuration file
+  val lines = Source.fromFile(s"$home/.twitter/activator").getLines().toList //TODO put this in configuration file
 
   val consumer = Consumer(lines(0), lines(1))
   val token = Token(lines(2), lines(3))

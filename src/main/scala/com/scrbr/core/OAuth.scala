@@ -3,13 +3,15 @@ package com.scrbr.core
 /**
   * Created by vvass on 4/16/16.
   */
-import javax.crypto
+import java.net.URLEncoder
 import java.nio.charset.Charset
+import javax.crypto
+
+import scala.collection.immutable.TreeMap
 import spray.http.{HttpEntity, MediaTypes, ContentType, HttpRequest}
 import spray.http.HttpHeaders.RawHeader
+
 import org.parboiled.common.Base64
-import scala.collection.immutable.TreeMap
-import java.net.URLEncoder
 
 object OAuth {
   case class Consumer(key: String, secret: String)

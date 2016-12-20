@@ -14,7 +14,7 @@ lazy val root = (project in file(".")).
   enablePlugins(TomcatPlugin).
   settings(
     name := "scrbr",
-    logLevel := Level.Debug
+    logLevel := Level.Info
   )
 
 resolvers ++= Seq(
@@ -35,7 +35,7 @@ libraryDependencies ++= {
     // -- metrics and health checks --
     "io.dropwizard.metrics".%("metrics-core")                       % "3.1.2",
     // -- logging --
-    "ch.qos.logback".%("logback-classic")                           % "1.1.7",                               % "3.5.4_a2.3",
+    "ch.qos.logback".%("logback-classic")                           % "1.1.7",
     // -- spray --
     "io.spray".%%("spray-can")                                      % iospray,
     "io.spray".%%("spray-http")                                     % iospray,
@@ -57,6 +57,7 @@ libraryDependencies ++= {
     // -- twitter --
     "com.twitter".%("util-core_2.10")                               % "6.33.0",
     "javax.servlet".%("javax.servlet-api")                          % "3.0.1"         % "provided",
+    "org.twitter4j".%("twitter4j-core")                             % "4.0.5",
     // -- testing --
     "org.specs2".%%("specs2-core")                                  % akkaVersion     % "test",
     "org.scalatest" %%("scalatest")                                 % "2.2.6"         % "test"

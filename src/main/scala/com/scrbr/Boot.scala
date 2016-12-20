@@ -18,6 +18,7 @@ trait Instrumented {
 
 
 class Boot extends WebBoot with HostConfiguration with Instrumented{
+  println("The starting time is " + System.currentTimeMillis())
 
   val bootCounter: Counter = metrics.counter("Starting boot counter.")
   bootCounter.inc() // Increments up
@@ -27,7 +28,7 @@ class Boot extends WebBoot with HostConfiguration with Instrumented{
 
   // This actor works with couchbase in order to server up results
 //  lazy val contentActor = system.actorOf(Props(new TweetContentActor(system)))
-    lazy val contentActor = system.actorOf(Props(new TweetContentCouchbaseActor(system)))
+  lazy val contentActor = system.actorOf(Props(new TweetContentCouchbaseActor(system)))
 
   // This actor works with Twitter in order to start a streaming catcher
   lazy val serviceActor = system.actorOf(Props(new TweetStreamerActor(TweetStreamerActor.twitterUri_v2, contentActor) with OAuthTwitterAuthorization ))
