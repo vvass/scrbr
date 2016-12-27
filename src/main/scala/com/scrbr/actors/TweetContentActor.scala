@@ -3,7 +3,6 @@ package com.scrbr.actors
 import akka.actor.{Actor, ActorSystem}
 import akka.io.IO
 import akka.pattern.ask
-import com.scrbr.core.domain.CouchClientResponseProtocol.CouchClientResponseEntity
 
 import com.scrbr.utilities.corenlp.TweetAnnotator
 import com.scrbr.core.domain.Tweet
@@ -28,7 +27,7 @@ import java.net.URLEncoder
   * Created by vvass on 4/28/16.
   */
 
-
+@deprecated // TODO we need to remove this
 class TweetContentActor(sys: ActorSystem) extends Actor
   with TweetAnnotator {
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -62,45 +61,53 @@ class TweetContentActor(sys: ActorSystem) extends Actor
   }
 }
 
-class TweetContentCouchbaseActor(sys: ActorSystem) extends Actor
-  with TweetAnnotator {
+class TweetContentCouchbaseActor(sys: ActorSystem) extends Actor {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
   implicit val system: ActorSystem = sys
 
-  val logger = LoggerFactory.getLogger(classOf[TweetContentActor])
+  val logger = LoggerFactory.getLogger(classOf[TweetContentCouchbaseActor])
 
   // Used to figure out if a sting is empty
   def isEmpty(x: String) = x != null && x.trim.nonEmpty
 
   def receive = {
+  
+    /*
+     *  All tweet end up here. This is where we use play framework to send messages
+     *  to couch-client api. The return will be a JSON with status and result. Result
+     *  will have information if it was found in the couchbase server (System of Storage).
+     *  Status will be 'OK' if something found or 'KO' if nothing found.
+     */
+  
     case tweet: Tweet => {
 
       val startTimestamp = System.currentTimeMillis()
 
       val displayCompleteTimestamp = s"Completed in ${System.currentTimeMillis() - startTimestamp} millis. - "+System.currentTimeMillis()
-
-      val logRequest: HttpRequest => HttpRequest = { r => logger.debug(r.toString); r }
-      val logResponse: HttpResponse => HttpResponse = { r => logger.debug(r.toString); r }
-
+  
+      lazy val logRequest: HttpRequest => HttpRequest = { r => logger.debug(r.toString); r }
+      lazy val logResponse: HttpResponse => HttpResponse = { r => logger.debug(r.toString); r }
 
       // This is the new way that reaches out to the service couch client
       // TODO make into a common class
-      val pipeline = (
+      val pipeline : HttpRequest => Future[HttpResponse] = (
         addHeader("X-My-Special-Header", "fancy-value")
         ~> addHeader("Accept", "application/json") // we want to get json so that we can marshall it to CouchClientResponseEntity
-//        ~> logRequest
+//        ~> logRequest // TODO this is not working right now
         ~> encode(Gzip)
         ~> sendReceive
-//        ~> logResponse
+//        ~> logResponse // TODO this is not working right now
         ~> decode(Deflate)
-        ~> unmarshal[CouchClientResponseEntity] // Unmarshalling of instances of type A into instances of type B (see akka unmarshall)
+        ~> unmarshal[HttpResponse] // Unmarshalling of instances of type A into instances of type B (see akka unmarshall)
       )
 
       //This is done so that we can make sure we only process US traffic
       if(tweet.lang == "en") { // TODO put this in a config
 
+        // TODO DEV we need a way to take in hashtags (@) - ex @realDonaldTrump. Might need a different query
+        
         // val annotatedText = tweetCoreProccessor.annotate(tweet.text)
         lazy val response = pipeline {
           val t = URLEncoder.encode(tweet.text.toString, "UTF-8")
@@ -110,29 +117,33 @@ class TweetContentCouchbaseActor(sys: ActorSystem) extends Actor
         }
 
         response.onComplete {
-          case Success(response: CouchClientResponseEntity) => {
+          case Success(response) => {
 
             // TODO add to config or have a way to process
             if(false) println(displayCompleteTimestamp)
-            if(true) print("*")
-            if(isEmpty(response.data)){
-              println("\n\n" + response.data + "\n\n\n" + tweet.toString )
+            if(false) print("*")
+            if(isEmpty(response.entity.toString)) {
+              println("\n\n" + response.entity.toString + "\n\n\n" + tweet.toString )
             }
           }
 
           case Failure(error) => {
-            println(System.currentTimeMillis())
-            logger.info(s"You had a failure -- $error")
+            println("You had a failure in TweetContentCouchbaseActor while trying to talk to Couchbase Client")
+            logger.info(s"You had a failure in TweetContentCouchbaseActor while trying to talk to Couchbase Client  -- \n $error")
           }
         }
       }
 
-      def shutdown(): Unit = {
+      def shutdown(): Unit = { // TODO not used at the moment
         IO(Http).ask(Http.CloseAll)(1.second).await
         system.shutdown()
       }
 
     }
-
+  
+    //TODO we need to add this to config and separate exception
+    case _ => throw new Exception("Tweet is malformed or never sent. Take a look at TweetCouchClientWithPlayActor")
+  
+  
   }
 }

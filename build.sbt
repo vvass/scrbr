@@ -1,10 +1,9 @@
 import sbt.Keys._
 import sbt.Level
-import sbt.dsl._
 
 lazy val commonSettings = Seq(
   organization := "com.44labs",
-  version      := "1.0",
+  version      := "1.1",
   scalaVersion := "2.11.8"
 )
 
@@ -36,7 +35,9 @@ libraryDependencies ++= {
     "io.dropwizard.metrics".%("metrics-core")                       % "3.1.2",
     // -- logging --
     "ch.qos.logback".%("logback-classic")                           % "1.1.7",
-    // -- spray --
+    // -- spray -- This will all be deprecated. Teams are no longer supporting this. For now we
+    // use this for our streaming service. It will eventually have to be replaced with Akka-http.
+    // That is the new Spray service.
     "io.spray".%%("spray-can")                                      % iospray,
     "io.spray".%%("spray-http")                                     % iospray,
     "io.spray".%%("spray-util")                                     % iospray,
@@ -45,7 +46,8 @@ libraryDependencies ++= {
     "io.spray".%%("spray-servlet")                                  % iospray,
     "io.spray".%%("spray-testkit")                                  % iospray         % "test",
     "io.spray".%%("spray-json")                                     % "1.3.2",
-    // -- couchbase --
+    // TODO make sure you fix this
+    // -- couchbase -- Unfortunately if you remove this we will have issues with Play and json in Campaing.scala
     "org.reactivecouchbase".%%("reactivecouchbase-core")            % "0.4-SNAPSHOT",
     // -- CoreNLP --
     "org.clulab".%%("processors")                                   % "5.8.3",
@@ -71,11 +73,15 @@ packageOptions in assembly ~= { pos =>
     po.isInstanceOf[Package.MainClass]
   }
 }
-//TODO figure out what other options we will need for assembling jar files, do we need dependencies - https://github.com/sbt/sbt-assembly
-//TODO we need to figure if we need to have content hash at the end of file name - https://github.com/sbt/sbt-assembly
-//TODO we will need to look at appending scripts (prepending shebang) to the end of assembly, might be useful for deployments - https://github.com/sbt/sbt-assembly
+// TODO figure out what other options we will need for assembling jar files, do we need dependencies - https://github.com/sbt/sbt-assembly
+// TODO we need to figure if we need to have content hash at the end of file name - https://github.com/sbt/sbt-assembly
+// TODO we will need to look at appending scripts (prepending shebang) to the end of assembly, might be useful for deployments - https://github.com/sbt/sbt-assembly
 // This is intended to be used with a JAR that only contains your project
 assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false, includeDependency = false)
+
+// This allows you to use the tomcat context file instead of default
+// -- https://github.com/earldouglas/xsbt-web-plugin/issues/317
+//containerArgs := Seq("--context-xml", "/usr/local/Cellar/tomcat/8.0.33/libexec/conf/context.xml")
 
 
 //Adds tomcat container and remote debugging

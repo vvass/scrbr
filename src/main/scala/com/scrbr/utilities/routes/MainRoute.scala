@@ -5,7 +5,7 @@ import spray.routing.HttpService
 /**
   * Created by vvass on 4/15/16.
   */
-trait MainServiceRoute extends HttpService{
+trait MainServiceRoute extends HttpService { // TODO we need to remove this
 
   implicit val executionContext = actorRefFactory.dispatcher
 

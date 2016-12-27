@@ -17,6 +17,9 @@ import akka.io.IO
   * Created by vvass on 4/16/16.
   */
 
+
+// TODO we need to move this to AKKA-HTTP since Spray is done. This is big
+
 class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with TweetMarshaller {
   this: TwitterAuthorization =>
   val io = IO(Http)(context.system)
@@ -28,7 +31,7 @@ class TweetStreamerActor(uri: Uri, processor: ActorRef) extends Actor with Tweet
 
   def ready: Receive = {
     case _ =>
-      logger.debug("I got a message")
+      logger.info("It's starting!!!!!")
       val body = HttpEntity(ContentType(MediaTypes.`application/x-www-form-urlencoded`), s"stall_warnings=true")
       val request = HttpRequest(HttpMethods.POST, uri = uri, entity = body) ~> authorize
       sendTo(io).withResponsesReceivedBy(self)(request)
