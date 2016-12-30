@@ -8,6 +8,7 @@ package com.scrbr.core.domain
 case class User (
   id: String,
   lang: String,
+  screen_name: String, // TODO make camel case
   followersCount: Int
 )
 

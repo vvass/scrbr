@@ -66,10 +66,11 @@ trait TweetMarshaller {
       (
         user.fields("id_str"),
         user.fields("lang"),
+        user.fields("screen_name"),
         user.fields("followers_count")
       ) match {
-        case (JsString(id), JsString(lang), JsNumber(followers)) => Right(User(id, lang, followers.toInt))
-        case (JsString(id), _, _)                                => Right(User(id, "", 0))
+        case (JsString(id), JsString(lang), JsString(screen_name), JsNumber(followers)) => Right(User(id, lang, screen_name,followers.toInt))
+        case (JsString(id), _, _, _)                                => Right(User(id, "", "", 0))
         case _                                                   => Left(MalformedContent("bad user"))
       }
     }
@@ -88,6 +89,7 @@ trait TweetMarshaller {
     }
 
     def apply(entity: HttpEntity): Deserialized[Tweet] = {
+//      println(entity.data.asString)
       Try {
         val json = JsonParser(entity.asString).asJsObject
         (

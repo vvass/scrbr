@@ -6,7 +6,6 @@ import akka.pattern.ask
 
 import com.scrbr.utilities.corenlp.TweetAnnotator
 import com.scrbr.core.domain.Tweet
-import org.json4s.{DefaultFormats, Formats}
 
 import org.slf4j.LoggerFactory
 
@@ -19,7 +18,6 @@ import spray.client.pipelining._
 import spray.http._
 import spray.httpx.encoding.{Deflate, Gzip}
 import spray.util._
-import spray.json._
 
 import java.net.URLEncoder
 
@@ -84,8 +82,8 @@ class TweetContentCouchbaseActor(sys: ActorSystem) extends Actor {
     case tweet: Tweet => {
 
       val startTimestamp = System.currentTimeMillis()
-
       val displayCompleteTimestamp = s"Completed in ${System.currentTimeMillis() - startTimestamp} millis. - "+System.currentTimeMillis()
+      
   
       lazy val logRequest: HttpRequest => HttpRequest = { r => logger.debug(r.toString); r }
       lazy val logResponse: HttpResponse => HttpResponse = { r => logger.debug(r.toString); r }
@@ -110,24 +108,33 @@ class TweetContentCouchbaseActor(sys: ActorSystem) extends Actor {
         
         // val annotatedText = tweetCoreProccessor.annotate(tweet.text)
         lazy val response = pipeline {
-          val t = URLEncoder.encode(tweet.text.toString, "UTF-8")
+          val id = tweet.id.toLong
+          val sn = tweet.user.screen_name
+          val t = URLEncoder.encode(tweet.text.toString, "UTF-8").replaceAll("\\+","%20")
           // Send request to couch client to get a match from couchbase SOS
           // TODO makes sure that this is places in a configuration file
-          Get(s"http://192.168.99.100:9000/getDoc?primary=$t")
+          // Get(s"http://192.168.99.100:9000/getDoc?primary=$t")
+//          Get(s"http://192.168.99.100:9000/newGetDoc/$id/$t")
+          Get(s"http://192.168.99.100:9000/newGetDoc/$id/$sn/$t")
         }
 
         response.onComplete {
           case Success(response) => {
-
+            
             // TODO add to config or have a way to process
             if(false) println(displayCompleteTimestamp)
-            if(false) print("*")
-            if(isEmpty(response.entity.toString)) {
-              println("\n\n" + response.entity.toString + "\n\n\n" + tweet.toString )
+            if(tweet.text.contains("windshield")) { // TODO put in configuration
+              println("\n" + response.entity.toString + "\n" + tweet.toString )
             }
+            if(tweet.text.contains("cracked")){
+              println("\n" + response.entity.toString + "\n" + tweet.toString )
+            }
+            else print("*")
           }
 
           case Failure(error) => {
+            // TODO add to config
+            // TODO we want the return response to fail so that we dont process all these successes
             println("You had a failure in TweetContentCouchbaseActor while trying to talk to Couchbase Client")
             logger.info(s"You had a failure in TweetContentCouchbaseActor while trying to talk to Couchbase Client  -- \n $error")
           }
