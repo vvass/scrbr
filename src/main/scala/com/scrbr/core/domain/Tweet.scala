@@ -8,7 +8,7 @@ package com.scrbr.core.domain
 case class User (
   id: String,
   lang: String,
-  screen_name: String, // TODO make camel case
+  screenName: String,
   followersCount: Int
 )
 
@@ -19,7 +19,6 @@ case class Place (
   override lazy val toString = s"$name, $country"
 }
 
-// TODO make this a sealed class
 case class Tweet(
   id: String,
   user: User,

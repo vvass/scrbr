@@ -2,8 +2,8 @@ package com.scrbr
 
 import akka.actor.{ActorSystem, Props}
 import com.codahale.metrics.Counter
-import com.scrbr.actors.{TweetContentCouchbaseActor, OAuthTwitterAuthorization, TweetContentActor, TweetStreamerActor}
-import com.scrbr.config.HostConfiguration
+import com.scrbr.actors.{TweetContentCouchbaseActor, OAuthTwitterAuthorization, TweetStreamerActor}
+import com.scrbr.config.MainConfiguration
 import spray.servlet.WebBoot
 
 
@@ -16,8 +16,7 @@ trait Instrumented {
   val metrics = BootLoader.metricRegistry
 }
 
-
-class Boot extends WebBoot with HostConfiguration with Instrumented{
+class Boot extends WebBoot with Instrumented {
   println("The starting time is " + System.currentTimeMillis())
 
   val bootCounter: Counter = metrics.counter("Starting boot counter.")
@@ -27,7 +26,6 @@ class Boot extends WebBoot with HostConfiguration with Instrumented{
   implicit val system = ActorSystem("simple-service")
 
   // This actor works with couchbase in order to server up results
-//  lazy val contentActor = system.actorOf(Props(new TweetContentActor(system)))
   lazy val contentActor = system.actorOf(Props(new TweetContentCouchbaseActor(system)))
 
   // This actor works with Twitter in order to start a streaming catcher
@@ -41,7 +39,6 @@ class Boot extends WebBoot with HostConfiguration with Instrumented{
 }
 
 object BootLoader {
-
   // The application wide metrics registry.
   val metricRegistry = new com.codahale.metrics.MetricRegistry()
 }

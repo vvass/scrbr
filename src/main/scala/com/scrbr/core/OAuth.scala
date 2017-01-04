@@ -13,7 +13,7 @@ import spray.http.HttpHeaders.RawHeader
 
 import org.parboiled.common.Base64
 
-object OAuth { // TODO we need to move this a more relavent location under utilities directory
+object OAuth {
   case class Consumer(key: String, secret: String)
   case class Token(value: String, secret: String)
 
